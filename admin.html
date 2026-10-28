@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>UDITH STORE | Admin</title>
+<style>
+:root{--bg:#050a08;--panel:#0a1411;--line:#17402c;--text:#d3ffe4;--muted:#7fb39a;--g:#3dff8b;--c:#22e4ff;--r:#ff4466;--on-g:#03120a;box-sizing:border-box}
+@media (prefers-color-scheme:light){:root{--bg:#eef7f1;--panel:#fff;--line:#b7d9c4;--text:#0b2417;--muted:#3f6b53;--g:#0a8a45;--c:#0a7f98;--r:#c4203f;--on-g:#fff}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font:400 .95rem/1.55 ui-monospace,Menlo,Consolas,monospace;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.wrap{width:min(1100px,94%);margin:0 auto;padding:18px 0 60px}
+h1,h2,h3{margin:0}h1{font-size:1.4rem;color:var(--g)}h1 span{color:var(--text)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.btn{border:1px solid var(--g);background:var(--g);color:var(--on-g);padding:9px 14px;font-weight:700;font-size:.85rem;font-family:inherit;cursor:pointer;border-radius:4px}
+.btn:hover{filter:brightness(1.12)}.btn.line{background:transparent;color:var(--g)}.btn.red{background:var(--r);border-color:var(--r);color:#fff}.btn.sm{padding:5px 10px;font-size:.78rem}
+.btn:disabled{opacity:.5;cursor:wait}
+input,select,textarea{padding:10px 12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;border-radius:4px;max-width:100%}
+textarea{width:100%;min-height:150px}
+.box{background:var(--panel);border:1px solid var(--line);padding:16px;margin-bottom:16px;border-radius:6px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{background:transparent;border:1px solid var(--line);color:var(--c);padding:8px 16px;font:inherit;cursor:pointer;border-radius:4px}
+.tab.on{background:var(--g);color:var(--on-g);border-color:var(--g);font-weight:700}
+.mu{color:var(--muted)}.ok{color:var(--g)}.er{color:var(--r)}
+table{width:100%;border-collapse:collapse}
+th,td{padding:7px 8px;border-bottom:1px dashed var(--line);text-align:left;vertical-align:middle}
+th{color:var(--muted);font-weight:400;font-size:.8rem}
+td.id{color:var(--g);font-weight:700}
+.tw{overflow-x:auto}
+td input[type=number]{width:120px;padding:6px 8px}
+.sold{color:var(--r);font-weight:700}
+.login{max-width:380px;margin:12vh auto 0}
+.login input{width:100%;margin:10px 0}
+#msg{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:var(--on-g);padding:10px 18px;border-radius:4px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .25s;z-index:9;max-width:92%}
+#msg.show{opacity:1}#msg.bad{background:var(--r);color:#fff}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- LOGIN -->
+<div id="login" class="login box">
+  <h1>UDITH<span>_ADMIN</span></h1>
+  <p class="mu">Admin password eka danna.</p>
+  <input id="pw" type="password" placeholder="Admin password" autocomplete="current-password">
+  <button class="btn" id="loginBtn" style="width:100%">Login</button>
+</div>
+
+<!-- APP -->
+<div id="app" class="hide">
+  <div class="top">
+    <h1>UDITH<span>_ADMIN</span></h1>
+    <div class="row"><a class="btn line sm" href="/" target="_blank">View site</a><button class="btn line sm" id="logout">Logout</button></div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-t="ids">IDs &amp; prices</button>
+    <button class="tab" data-t="add">Add IDs</button>
+    <button class="tab" data-t="users">Customers</button>
+  </div>
+
+  <!-- IDs -->
+  <div id="t-ids">
+    <div class="box">
+      <div class="row">
+        <input id="s" type="search" placeholder="Search ID" style="flex:1;min-width:160px">
+        <select id="fSeries"><option value="">All series</option><option>14</option><option>15</option><option>16</option><option>17</option></select>
+        <select id="fState"><option value="">All</option><option value="noprice">No price</option><option value="priced">Has price</option><option value="sold">Sold</option><option value="avail">Available</option></select>
+      </div>
+      <p class="mu" id="stat" style="margin:10px 0 0"></p>
+    </div>
+
+    <div class="box">
+      <h3 style="margin-bottom:10px">Bulk price change</h3>
+      <div class="row">
+        <select id="target"><option value="filtered">Filtered IDs</option><option value="selected">Selected IDs</option><option value="all">ALL IDs</option></select>
+        <select id="mode">
+          <option value="set">Set price to</option>
+          <option value="add">Increase by Rs.</option>
+          <option value="sub">Decrease by Rs.</option>
+          <option value="pct">Increase by %</option>
+          <option value="pctsub">Decrease by %</option>
+          <option value="clear">Remove price</option>
+        </select>
+        <input id="val" type="number" min="0" step="any" placeholder="Amount" style="width:130px">
+        <button class="btn" id="apply">Apply</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <span class="mu">Selected:</span><b id="selN">0</b>
+        <button class="btn line sm" id="markSold">Mark sold</button>
+        <button class="btn line sm" id="markAvail">Mark available</button>
+        <button class="btn red sm" id="delSel">Delete selected</button>
+      </div>
+    </div>
+
+    <div class="box tw">
+      <table>
+        <thead><tr><th style="width:30px"><input type="checkbox" id="selAll" title="Select all filtered"></th><th>ID</th><th>Price (Rs.)</th><th>Status</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div style="text-align:center;margin-top:12px"><button class="btn line sm hide" id="more">Show more</button></div>
+    </div>
+  </div>
+
+  <!-- ADD -->
+  <div id="t-add" class="hide">
+    <div class="box">
+      <h3 style="margin-bottom:6px">Add new IDs</h3>
+      <p class="mu">ID godak ekapara paste karanna (space / comma / new line walin wenkaranna). Duplicate IDs skip wenawa.</p>
+      <textarea id="newIds" placeholder="15000000001&#10;15000000002&#10;15000000003"></textarea>
+      <div class="row" style="margin-top:10px">
+        <input id="newPrice" type="number" min="0" placeholder="Price for these (optional)" style="width:230px">
+        <button class="btn" id="addBtn">Add IDs</button>
+      </div>
+      <p id="addRes" style="margin:10px 0 0"></p>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div id="t-users" class="hide">
+    <div class="box tw">
+      <p class="mu" id="uCount"></p>
+      <table><thead><tr><th>Name</th><th>Created</th><th></th></tr></thead><tbody id="uRows"></tbody></table>
+    </div>
+  </div>
+</div>
+</div>
+<div id="msg" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let tok=sessionStorage.getItem("udithAdmin")||"",ids=[],sel=new Set(),limit=300;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function say(t,bad){const m=$("msg");m.textContent=t;m.className="show"+(bad?" bad":"");clearTimeout(say.t);say.t=setTimeout(()=>m.className="",2600)}
+async function api(path,body){
+  const r=await fetch("/api"+path,{method:body?"POST":"GET",headers:{"Content-Type":"application/json",...(tok?{Authorization:"Bearer "+tok}:{})},body:body?JSON.stringify(body):undefined});
+  let j={};try{j=await r.json()}catch(e){}
+  if(r.status===401&&tok&&path!=="/admin/login"){out();throw new Error("Session ended, login again")}
+  if(!r.ok)throw new Error(j.error||("Error "+r.status));
+  return j;
+}
+function out(){tok="";sessionStorage.removeItem("udithAdmin");$("app").classList.add("hide");$("login").classList.remove("hide")}
+async function enter(){$("login").classList.add("hide");$("app").classList.remove("hide");await loadIds()}
+$("loginBtn").onclick=async()=>{$("loginBtn").disabled=true;try{const j=await api("/admin/login",{password:$("pw").value});tok=j.token;sessionStorage.setItem("udithAdmin",tok);$("pw").value="";await enter()}catch(e){say(e.message,1)}$("loginBtn").disabled=false};
+$("pw").onkeydown=e=>{if(e.key==="Enter")$("loginBtn").click()};
+$("logout").onclick=out;
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===b));["ids","add","users"].forEach(t=>$("t-"+t).classList.toggle("hide",t!==b.dataset.t));if(b.dataset.t==="users")loadUsers()});
+
+/* ---- IDs ---- */
+async function loadIds(){try{ids=(await api("/admin/ids")).ids;sel=new Set([...sel].filter(x=>ids.some(i=>i.id===x)));render()}catch(e){say(e.message,1)}}
+function filtered(){const q=$("s").value.trim(),se=$("fSeries").value,st=$("fState").value;
+  return ids.filter(x=>(!q||x.id.includes(q))&&(!se||x.id.startsWith(se))&&(!st||(st==="noprice"?x.price==null:st==="priced"?x.price!=null:st==="sold"?x.sold:!x.sold)))}
+function render(){
+  const f=filtered(),priced=ids.filter(x=>x.price!=null).length;
+  $("stat").textContent=`${ids.length} IDs total · ${priced} priced · ${ids.length-priced} no price · showing ${f.length} after filter`;
+  $("rows").innerHTML=f.slice(0,limit).map(x=>`<tr><td><input type="checkbox" data-sel="${x.id}" ${sel.has(x.id)?"checked":""}></td><td class="id">${x.id}</td><td><input type="number" min="0" data-price="${x.id}" value="${x.price??""}" placeholder="no price"></td><td>${x.sold?'<span class="sold">SOLD</span>':'<span class="ok">available</span>'}</td><td><button class="btn red sm" data-del="${x.id}">delete</button></td></tr>`).join("")||'<tr><td colspan="5" class="mu">No IDs</td></tr>';
+  $("more").classList.toggle("hide",f.length<=limit);$("more").textContent=`Show more (${f.length-limit} left)`;
+  $("selN").textContent=sel.size;$("selAll").checked=f.length>0&&f.slice(0,limit).every(x=>sel.has(x.id));
+}
+["s","fSeries","fState"].forEach(i=>$(i).oninput=()=>{limit=300;render()});
+$("more").onclick=()=>{limit+=300;render()};
+$("selAll").onchange=e=>{filtered().slice(0,limit).forEach(x=>e.target.checked?sel.add(x.id):sel.delete(x.id));render()};
+$("rows").addEventListener("change",async e=>{
+  const c=e.target.dataset;
+  if(c.sel){e.target.checked?sel.add(c.sel):sel.delete(c.sel);$("selN").textContent=sel.size;return}
+  if(c.price){const v=e.target.value===""?null:Number(e.target.value);
+    try{await api("/admin/ids/price",v==null?{ids:[c.price],mode:"clear"}:{ids:[c.price],mode:"set",value:v});ids.find(x=>x.id===c.price).price=v;say("Saved "+c.price);render()}catch(er){say(er.message,1)}}
+});
+$("rows").addEventListener("click",async e=>{const id=e.target.dataset.del;if(!id)return;if(!confirm("Delete ID "+id+"?"))return;
+  try{await api("/admin/ids/delete",{ids:[id]});ids=ids.filter(x=>x.id!==id);sel.delete(id);say("Deleted");render()}catch(er){say(er.message,1)}});
+
+function targetIds(){const t=$("target").value;return t==="all"?"all":t==="selected"?[...sel]:filtered().map(x=>x.id)}
+$("apply").onclick=async()=>{
+  const t=targetIds(),n=t==="all"?ids.length:t.length,m=$("mode").value,v=Number($("val").value);
+  if(!n){say("No IDs in that target",1);return}
+  if(m!=="clear"&&(!Number.isFinite(v)||$("val").value===""||v<0)){say("Enter a valid amount",1);return}
+  const label={set:"set price to Rs. "+v,add:"add Rs. "+v,sub:"subtract Rs. "+v,pct:"raise by "+v+"%",pctsub:"lower by "+v+"%",clear:"remove the price of"}[m];
+  if(!confirm(`${label} → ${n} IDs. Continue?`))return;
+  const body={ids:t,mode:m==="sub"?"add":m==="pct"?"percent":m==="pctsub"?"percent":m,value:m==="sub"||m==="pctsub"?-v:v};
+  $("apply").disabled=true;
+  try{const j=await api("/admin/ids/price",body);say(`Updated ${j.changed} IDs`+(j.skipped?` (${j.skipped} skipped: no price yet)`:""));await loadIds()}catch(e){say(e.message,1)}
+  $("apply").disabled=false;
+};
+async function selAction(path,body,msg){if(!sel.size){say("Select some IDs first",1);return}try{await api(path,{ids:[...sel],...body});say(msg);if(path.endsWith("delete"))sel.clear();await loadIds()}catch(e){say(e.message,1)}}
+$("markSold").onclick=()=>selAction("/admin/ids/sold",{sold:true},"Marked sold");
+$("markAvail").onclick=()=>selAction("/admin/ids/sold",{sold:false},"Marked available");
+$("delSel").onclick=()=>{if(sel.size&&confirm(`Delete ${sel.size} IDs for good?`))selAction("/admin/ids/delete",{},"Deleted")};
+
+/* ---- Add ---- */
+$("addBtn").onclick=async()=>{
+  const t=$("newIds").value.trim();if(!t){say("Paste some IDs first",1);return}
+  $("addBtn").disabled=true;
+  try{const j=await api("/admin/ids/add",{ids:t,price:$("newPrice").value===""?null:Number($("newPrice").value)});
+    $("addRes").innerHTML=`<span class="ok">Added ${j.added}</span> · ${j.duplicates} already existed`+(j.invalid.length?` · <span class="er">invalid (6-15 digits only): ${j.invalid.map(esc).join(", ")}</span>`:"");
+    $("newIds").value="";await loadIds()}catch(e){say(e.message,1)}
+  $("addBtn").disabled=false;
+};
+
+/* ---- Users ---- */
+async function loadUsers(){try{const u=(await api("/admin/users")).users;$("uCount").textContent=u.length+" customer accounts";
+  $("uRows").innerHTML=u.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td class="mu">${esc((x.created||"").slice(0,10))}</td><td><button class="btn line sm" data-reset="${esc(x.name)}">new password</button> <button class="btn red sm" data-udel="${esc(x.name)}">delete</button></td></tr>`).join("")||'<tr><td colspan="3" class="mu">No customers yet</td></tr>'}catch(e){say(e.message,1)}}
+$("uRows").addEventListener("click",async e=>{const d=e.target.dataset;
+  try{if(d.udel&&confirm("Delete account "+d.udel+"?")){await api("/admin/users/delete",{name:d.udel});say("Deleted");loadUsers()}
+  if(d.reset){const p=prompt("New password for "+d.reset+" (min 6 characters):");if(p){await api("/admin/users/reset",{name:d.reset,password:p});say("Password changed")}}}catch(er){say(er.message,1)}});
+
+if(tok)enter().catch(()=>out());
+</script>
+</body>
+</html>
